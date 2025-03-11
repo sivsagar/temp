@@ -1,0 +1,3120 @@
+1. Array‐Based Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+void push(int x) {
+    if (top >= MAX - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    stack[++top] = x;
+}
+
+int pop() {
+    if (top < 0) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return stack[top--];
+}
+
+void display() {
+    if (top < 0) {
+        printf("Stack is empty\n");
+        return;
+    }
+    printf("Stack: ");
+    for (int i = 0; i <= top; i++) {
+        printf("%d ", stack[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    push(10);
+    push(20);
+    push(30);
+    display();
+    printf("Popped: %d\n", pop());
+    display();
+    return 0;
+}
+2. Array‐Based Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+int queue[MAX];
+int front = 0, rear = -1, count = 0;
+
+void enqueue(int x) {
+    if (count == MAX) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    rear = (rear + 1) % MAX;
+    queue[rear] = x;
+    count++;
+}
+
+int dequeue() {
+    if (count == 0) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    int x = queue[front];
+    front = (front + 1) % MAX;
+    count--;
+    return x;
+}
+
+void display() {
+    if (count == 0) {
+        printf("Queue is empty\n");
+        return;
+    }
+    printf("Queue: ");
+    int i = front, cnt = count;
+    while (cnt--) {
+        printf("%d ", queue[i]);
+        i = (i + 1) % MAX;
+    }
+    printf("\n");
+}
+
+int main() {
+    enqueue(10);
+    enqueue(20);
+    enqueue(30);
+    display();
+    printf("Dequeued: %d\n", dequeue());
+    display();
+    return 0;
+}
+3. Circular Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 5
+
+int cq[MAX];
+int front = -1, rear = -1;
+
+void enqueue(int x) {
+    if ((front == 0 && rear == MAX - 1) ||
+        (rear == (front - 1) % (MAX - 1))) {
+        printf("Circular Queue Overflow\n");
+        return;
+    } else if (front == -1) { // empty queue
+        front = rear = 0;
+        cq[rear] = x;
+    } else if (rear == MAX - 1 && front != 0) {
+        rear = 0;
+        cq[rear] = x;
+    } else {
+        rear++;
+        cq[rear] = x;
+    }
+}
+
+int dequeue() {
+    if (front == -1) {
+        printf("Circular Queue Underflow\n");
+        return -1;
+    }
+    int data = cq[front];
+    cq[front] = -1; // optional: clear data
+    if (front == rear) {
+        front = rear = -1;
+    } else if (front == MAX - 1)
+        front = 0;
+    else
+        front++;
+    return data;
+}
+
+void display() {
+    if (front == -1) {
+        printf("Circular Queue is empty\n");
+        return;
+    }
+    printf("Circular Queue: ");
+    if (rear >= front) {
+        for (int i = front; i <= rear; i++)
+            printf("%d ", cq[i]);
+    } else {
+        for (int i = front; i < MAX; i++)
+            printf("%d ", cq[i]);
+        for (int i = 0; i <= rear; i++)
+            printf("%d ", cq[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    enqueue(10);
+    enqueue(20);
+    enqueue(30);
+    enqueue(40);
+    display();
+    printf("Dequeued: %d\n", dequeue());
+    display();
+    enqueue(50);
+    display();
+    return 0;
+}
+4. Linked List–Based Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+Node* top = NULL;
+
+void push(int x) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if (!newNode) {
+        printf("Memory allocation error\n");
+        return;
+    }
+    newNode->data = x;
+    newNode->next = top;
+    top = newNode;
+}
+
+int pop() {
+    if (top == NULL) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    Node* temp = top;
+    int data = top->data;
+    top = top->next;
+    free(temp);
+    return data;
+}
+
+void display() {
+    Node* temp = top;
+    if (temp == NULL) {
+        printf("Stack is empty\n");
+        return;
+    }
+    printf("Stack: ");
+    while (temp) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    push(10);
+    push(20);
+    push(30);
+    display();
+    printf("Popped: %d\n", pop());
+    display();
+    return 0;
+}
+5. Linked List–Based Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+Node* front = NULL;
+Node* rear = NULL;
+
+void enqueue(int x) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if (!newNode) {
+        printf("Memory allocation error\n");
+        return;
+    }
+    newNode->data = x;
+    newNode->next = NULL;
+    if (rear == NULL) {
+        front = rear = newNode;
+    } else {
+        rear->next = newNode;
+        rear = newNode;
+    }
+}
+
+int dequeue() {
+    if (front == NULL) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    Node* temp = front;
+    int data = temp->data;
+    front = front->next;
+    if (front == NULL)
+        rear = NULL;
+    free(temp);
+    return data;
+}
+
+void display() {
+    Node* temp = front;
+    if (temp == NULL) {
+        printf("Queue is empty\n");
+        return;
+    }
+    printf("Queue: ");
+    while (temp) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    enqueue(10);
+    enqueue(20);
+    enqueue(30);
+    display();
+    printf("Dequeued: %d\n", dequeue());
+    display();
+    return 0;
+}
+6. Check Balanced Parentheses Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#define MAX 1000
+
+typedef struct {
+    char arr[MAX];
+    int top;
+} Stack;
+
+void initStack(Stack *s) {
+    s->top = -1;
+}
+
+bool isEmpty(Stack *s) {
+    return s->top == -1;
+}
+
+void push(Stack *s, char ch) {
+    if (s->top >= MAX - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    s->arr[++s->top] = ch;
+}
+
+char pop(Stack *s) {
+    if (isEmpty(s))
+        return '\0';
+    return s->arr[s->top--];
+}
+
+bool isMatchingPair(char open, char close) {
+    return ((open == '(' && close == ')') ||
+            (open == '{' && close == '}') ||
+            (open == '[' && close == ']'));
+}
+
+bool areParenthesesBalanced(const char *exp) {
+    Stack s;
+    initStack(&s);
+    for (int i = 0; exp[i] != '\0'; i++) {
+        char ch = exp[i];
+        if (ch == '(' || ch == '{' || ch == '[')
+            push(&s, ch);
+        else if (ch == ')' || ch == '}' || ch == ']') {
+            if (isEmpty(&s) || !isMatchingPair(pop(&s), ch))
+                return false;
+        }
+    }
+    return isEmpty(&s);
+}
+
+int main() {
+    char expression[MAX];
+    printf("Enter an expression: ");
+    fgets(expression, MAX, stdin);
+    expression[strcspn(expression, "\n")] = 0;
+    if (areParenthesesBalanced(expression))
+        printf("Balanced\n");
+    else
+        printf("Not Balanced\n");
+    return 0;
+}
+7. Palindrome Checker Using Stack & Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#define MAX 1000
+
+char stack[MAX];
+int top = -1;
+char queue[MAX];
+int front = 0, rear = -1;
+
+void pushCharacter(char c) {
+    stack[++top] = c;
+}
+
+char popCharacter() {
+    return stack[top--];
+}
+
+void enqueueCharacter(char c) {
+    queue[++rear] = c;
+}
+
+char dequeueCharacter() {
+    return queue[front++];
+}
+
+int main() {
+    char str[MAX];
+    printf("Enter a word: ");
+    scanf("%s", str);
+    int len = strlen(str);
+    for (int i = 0; i < len; i++) {
+        pushCharacter(str[i]);
+        enqueueCharacter(str[i]);
+    }
+    bool isPalindrome = true;
+    for (int i = 0; i < len / 2; i++) {
+        if (popCharacter() != dequeueCharacter()) {
+            isPalindrome = false;
+            break;
+        }
+    }
+    if (isPalindrome)
+        printf("The word, %s, is a palindrome.\n", str);
+    else
+        printf("The word, %s, is not a palindrome.\n", str);
+    return 0;
+}
+8. Reverse a String Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <string.h>
+#define MAX 1000
+
+char stack[MAX];
+int top = -1;
+
+void push(char c) {
+    stack[++top] = c;
+}
+
+char pop() {
+    return stack[top--];
+}
+
+int main() {
+    char str[MAX];
+    printf("Enter a string: ");
+    fgets(str, MAX, stdin);
+    int len = strlen(str);
+    if (str[len - 1] == '\n') { str[len - 1] = '\0'; len--; }
+    for (int i = 0; i < len; i++) {
+        push(str[i]);
+    }
+    printf("Reversed string: ");
+    while (top != -1) {
+        printf("%c", pop());
+    }
+    printf("\n");
+    return 0;
+}
+9. Evaluate a Postfix Expression
+c
+Copy
+Edit
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+void push(int num) {
+    stack[++top] = num;
+}
+
+int pop() {
+    return stack[top--];
+}
+
+int evaluatePostfix(char *exp) {
+    for (int i = 0; exp[i]; i++) {
+        if (isdigit(exp[i])) {
+            push(exp[i] - '0');
+        } else {
+            int val2 = pop();
+            int val1 = pop();
+            switch (exp[i]) {
+                case '+': push(val1 + val2); break;
+                case '-': push(val1 - val2); break;
+                case '*': push(val1 * val2); break;
+                case '/': push(val1 / val2); break;
+            }
+        }
+    }
+    return pop();
+}
+
+int main() {
+    char exp[MAX];
+    printf("Enter a postfix expression: ");
+    scanf("%s", exp);
+    int result = evaluatePostfix(exp);
+    printf("Result = %d\n", result);
+    return 0;
+}
+10. Producer–Consumer Problem with a Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 10
+
+int queue[MAX];
+int front = 0, rear = -1, count = 0;
+
+void enqueue(int task) {
+    if (count == MAX) {
+        printf("Queue is full. Producer waiting.\n");
+        return;
+    }
+    rear = (rear + 1) % MAX;
+    queue[rear] = task;
+    count++;
+}
+
+int dequeue() {
+    if (count == 0) {
+        printf("Queue is empty. Consumer waiting.\n");
+        return -1;
+    }
+    int task = queue[front];
+    front = (front + 1) % MAX;
+    count--;
+    return task;
+}
+
+int main() {
+    int i;
+    // Producer produces 5 tasks.
+    for (i = 1; i <= 5; i++) {
+        printf("Producing task %d\n", i);
+        enqueue(i);
+    }
+    // Consumer consumes 3 tasks.
+    for (i = 1; i <= 3; i++) {
+        int task = dequeue();
+        if (task != -1)
+            printf("Consuming task %d\n", task);
+    }
+    // Producer produces more tasks.
+    for (i = 6; i <= 8; i++) {
+        printf("Producing task %d\n", i);
+        enqueue(i);
+    }
+    // Consumer consumes remaining tasks.
+    while (count > 0) {
+        int task = dequeue();
+        if (task != -1)
+            printf("Consuming task %d\n", task);
+    }
+    return 0;
+}
+11. Merge Two Queues
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int front, rear;
+} Queue;
+
+void initQueue(Queue *q) {
+    q->front = 0;
+    q->rear = -1;
+}
+
+int isEmpty(Queue *q) {
+    return q->rear < q->front;
+}
+
+void enqueue(Queue *q, int x) {
+    if (q->rear >= MAX - 1) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    q->arr[++q->rear] = x;
+}
+
+int dequeue(Queue *q) {
+    if (isEmpty(q)) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    return q->arr[q->front++];
+}
+
+void displayQueue(Queue *q) {
+    for (int i = q->front; i <= q->rear; i++) {
+        printf("%d ", q->arr[i]);
+    }
+    printf("\n");
+}
+
+Queue mergeQueues(Queue *q1, Queue *q2) {
+    Queue merged;
+    initQueue(&merged);
+    while (!isEmpty(q1)) {
+        enqueue(&merged, dequeue(q1));
+    }
+    while (!isEmpty(q2)) {
+        enqueue(&merged, dequeue(q2));
+    }
+    return merged;
+}
+
+int main() {
+    Queue q1, q2;
+    initQueue(&q1);
+    initQueue(&q2);
+    
+    // Queue 1
+    enqueue(&q1, 1);
+    enqueue(&q1, 2);
+    enqueue(&q1, 3);
+    
+    // Queue 2
+    enqueue(&q2, 4);
+    enqueue(&q2, 5);
+    enqueue(&q2, 6);
+    
+    printf("Queue 1: ");
+    displayQueue(&q1);
+    printf("Queue 2: ");
+    displayQueue(&q2);
+    
+    Queue merged = mergeQueues(&q1, &q2);
+    printf("Merged Queue: ");
+    displayQueue(&merged);
+    
+    return 0;
+}
+12. Reverse a Queue Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int front, rear, count;
+} Queue;
+
+void initQueue(Queue *q) {
+    q->front = 0;
+    q->rear = -1;
+    q->count = 0;
+}
+
+int isEmptyQueue(Queue *q) {
+    return q->count == 0;
+}
+
+void enqueue(Queue *q, int x) {
+    if (q->count == MAX) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = x;
+    q->count++;
+}
+
+int dequeue(Queue *q) {
+    if (isEmptyQueue(q)) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    int x = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return x;
+}
+
+void displayQueue(Queue *q) {
+    int i = q->front, cnt = q->count;
+    while (cnt--) {
+        printf("%d ", q->arr[i]);
+        i = (i + 1) % MAX;
+    }
+    printf("\n");
+}
+
+typedef struct {
+    int arr[MAX];
+    int top;
+} Stack;
+
+void initStack(Stack *s) {
+    s->top = -1;
+}
+
+int isEmptyStack(Stack *s) {
+    return s->top == -1;
+}
+
+void push(Stack *s, int x) {
+    if (s->top == MAX - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    s->arr[++s->top] = x;
+}
+
+int pop(Stack *s) {
+    if (isEmptyStack(s)) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return s->arr[s->top--];
+}
+
+int main() {
+    Queue q;
+    initQueue(&q);
+    enqueue(&q, 1);
+    enqueue(&q, 2);
+    enqueue(&q, 3);
+    enqueue(&q, 4);
+    printf("Original Queue: ");
+    displayQueue(&q);
+    
+    Stack s;
+    initStack(&s);
+    while (!isEmptyQueue(&q))
+        push(&s, dequeue(&q));
+    while (!isEmptyStack(&s))
+        enqueue(&q, pop(&s));
+    
+    printf("Reversed Queue: ");
+    displayQueue(&q);
+    
+    return 0;
+}
+13. Reverse a Stack Using a Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int top;
+} Stack;
+
+void initStack(Stack *s) { s->top = -1; }
+int isEmptyStack(Stack *s) { return s->top == -1; }
+void push(Stack *s, int x) {
+    if (s->top == MAX - 1) { printf("Stack Overflow\n"); return; }
+    s->arr[++s->top] = x;
+}
+int pop(Stack *s) { 
+    if (isEmptyStack(s)) { printf("Stack Underflow\n"); return -1; }
+    return s->arr[s->top--];
+}
+void displayStack(Stack *s) {
+    for (int i = 0; i <= s->top; i++)
+        printf("%d ", s->arr[i]);
+    printf("\n");
+}
+
+typedef struct {
+    int arr[MAX];
+    int front, rear, count;
+} Queue;
+
+void initQueue(Queue *q) { q->front = 0; q->rear = -1; q->count = 0; }
+int isEmptyQueue(Queue *q) { return q->count == 0; }
+void enqueue(Queue *q, int x) {
+    if (q->count == MAX) { printf("Queue Overflow\n"); return; }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = x;
+    q->count++;
+}
+int dequeue(Queue *q) {
+    if (isEmptyQueue(q)) { printf("Queue Underflow\n"); return -1; }
+    int x = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return x;
+}
+
+int main() {
+    Stack s;
+    initStack(&s);
+    push(&s, 10);
+    push(&s, 20);
+    push(&s, 30);
+    printf("Original Stack: ");
+    displayStack(&s);
+    
+    Queue q;
+    initQueue(&q);
+    while (!isEmptyStack(&s))
+        enqueue(&q, pop(&s));
+    while (!isEmptyQueue(&q))
+        push(&s, dequeue(&q));
+    
+    printf("Reversed Stack: ");
+    displayStack(&s);
+    
+    return 0;
+}
+14. Deque (Double‐Ended Queue) Using an Array
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int front, rear;
+} Deque;
+
+void initDeque(Deque *d) {
+    d->front = -1;
+    d->rear = -1;
+}
+
+int isEmpty(Deque *d) {
+    return d->front == -1;
+}
+
+int isFull(Deque *d) {
+    return ((d->front == 0 && d->rear == MAX - 1) || (d->front == d->rear + 1));
+}
+
+void insertFront(Deque *d, int x) {
+    if (isFull(d)) {
+        printf("Deque Overflow\n");
+        return;
+    }
+    if (isEmpty(d))
+        d->front = d->rear = 0;
+    else if (d->front == 0)
+        d->front = MAX - 1;
+    else
+        d->front--;
+    d->arr[d->front] = x;
+}
+
+void insertRear(Deque *d, int x) {
+    if (isFull(d)) {
+        printf("Deque Overflow\n");
+        return;
+    }
+    if (isEmpty(d))
+        d->front = d->rear = 0;
+    else if (d->rear == MAX - 1)
+        d->rear = 0;
+    else
+        d->rear++;
+    d->arr[d->rear] = x;
+}
+
+int deleteFront(Deque *d) {
+    if (isEmpty(d)) {
+        printf("Deque Underflow\n");
+        return -1;
+    }
+    int x = d->arr[d->front];
+    if (d->front == d->rear)
+        d->front = d->rear = -1;
+    else if (d->front == MAX - 1)
+        d->front = 0;
+    else
+        d->front++;
+    return x;
+}
+
+int deleteRear(Deque *d) {
+    if (isEmpty(d)) {
+        printf("Deque Underflow\n");
+        return -1;
+    }
+    int x = d->arr[d->rear];
+    if (d->front == d->rear)
+        d->front = d->rear = -1;
+    else if (d->rear == 0)
+        d->rear = MAX - 1;
+    else
+        d->rear--;
+    return x;
+}
+
+void displayDeque(Deque *d) {
+    if (isEmpty(d)) {
+        printf("Deque is empty\n");
+        return;
+    }
+    printf("Deque: ");
+    int i = d->front;
+    while (1) {
+        printf("%d ", d->arr[i]);
+        if (i == d->rear)
+            break;
+        i = (i + 1) % MAX;
+    }
+    printf("\n");
+}
+
+int main() {
+    Deque dq;
+    initDeque(&dq);
+    insertRear(&dq, 10);
+    insertRear(&dq, 20);
+    insertFront(&dq, 5);
+    displayDeque(&dq);
+    printf("Deleted from front: %d\n", deleteFront(&dq));
+    displayDeque(&dq);
+    printf("Deleted from rear: %d\n", deleteRear(&dq));
+    displayDeque(&dq);
+    return 0;
+}
+15. Priority Queue Using a Linked List
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int data;
+    int priority;
+    struct Node* next;
+} Node;
+
+Node* front = NULL;
+
+void enqueue(int data, int priority) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->priority = priority;
+    if (front == NULL || priority < front->priority) {
+        newNode->next = front;
+        front = newNode;
+    } else {
+        Node* temp = front;
+        while (temp->next != NULL && temp->next->priority <= priority)
+            temp = temp->next;
+        newNode->next = temp->next;
+        temp->next = newNode;
+    }
+}
+
+int dequeue() {
+    if (front == NULL) {
+        printf("Priority Queue Underflow\n");
+        return -1;
+    }
+    Node* temp = front;
+    int data = temp->data;
+    front = front->next;
+    free(temp);
+    return data;
+}
+
+void display() {
+    Node* temp = front;
+    printf("Priority Queue: ");
+    while (temp) {
+        printf("(%d, p=%d) ", temp->data, temp->priority);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    enqueue(10, 2);
+    enqueue(20, 1);
+    enqueue(30, 3);
+    display();
+    printf("Dequeued: %d\n", dequeue());
+    display();
+    return 0;
+}
+16. Stack with getMin() in O(1)
+c
+Copy
+Edit
+#include <stdio.h>
+#include <limits.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int top;
+} Stack;
+
+Stack s, minStack;
+
+void initStack(Stack *s) {
+    s->top = -1;
+}
+
+void push(Stack *s, int x) {
+    if (s->top == MAX - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    s->arr[++s->top] = x;
+}
+
+int pop(Stack *s) {
+    if (s->top == -1) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return s->arr[s->top--];
+}
+
+void pushWithMin(int x) {
+    push(&s, x);
+    if (minStack.top == -1 || x <= minStack.arr[minStack.top])
+        push(&minStack, x);
+}
+
+int popWithMin() {
+    int x = pop(&s);
+    if (x == minStack.arr[minStack.top])
+        pop(&minStack);
+    return x;
+}
+
+int getMin() {
+    if (minStack.top == -1) {
+        printf("Stack is empty\n");
+        return INT_MAX;
+    }
+    return minStack.arr[minStack.top];
+}
+
+int main() {
+    initStack(&s);
+    initStack(&minStack);
+    
+    pushWithMin(3);
+    pushWithMin(5);
+    printf("Minimum: %d\n", getMin());
+    pushWithMin(2);
+    pushWithMin(1);
+    printf("Minimum: %d\n", getMin());
+    popWithMin();
+    printf("Minimum after pop: %d\n", getMin());
+    popWithMin();
+    printf("Minimum after pop: %d\n", getMin());
+    return 0;
+}
+17. Queue with getMax() Function
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int front, rear, count;
+} Queue;
+
+void initQueue(Queue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+
+int isEmptyQueue(Queue *q) { return q->count == 0; }
+
+void enqueue(Queue *q, int x) {
+    if (q->count == MAX) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = x;
+    q->count++;
+}
+
+int dequeue(Queue *q) {
+    if (isEmptyQueue(q)) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    int x = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return x;
+}
+
+typedef struct {
+    int arr[MAX];
+    int front, rear, count;
+} Deque;
+
+void initDeque(Deque *d) {
+    d->front = 0; d->rear = -1; d->count = 0;
+}
+
+int isEmptyDeque(Deque *d) { return d->count == 0; }
+
+void pushRear(Deque *d, int x) {
+    if (d->count == MAX) {
+        printf("Deque Overflow\n");
+        return;
+    }
+    d->rear = (d->rear + 1) % MAX;
+    d->arr[d->rear] = x;
+    d->count++;
+}
+
+int popRear(Deque *d) {
+    if (isEmptyDeque(d)) return -1;
+    int x = d->arr[d->rear];
+    d->rear = (d->rear - 1 + MAX) % MAX;
+    d->count--;
+    return x;
+}
+
+int getFront(Deque *d) {
+    if (isEmptyDeque(d)) return -1;
+    return d->arr[d->front];
+}
+
+void popFront(Deque *d) {
+    if (!isEmptyDeque(d)) {
+        d->front = (d->front + 1) % MAX;
+        d->count--;
+    }
+}
+
+void enqueueWithMax(Queue *q, Deque *d, int x) {
+    enqueue(q, x);
+    while (!isEmptyDeque(d) && d->arr[d->rear] < x)
+        popRear(d);
+    pushRear(d, x);
+}
+
+int dequeueWithMax(Queue *q, Deque *d) {
+    int x = dequeue(q);
+    if (x == getFront(d))
+        popFront(d);
+    return x;
+}
+
+int getMax(Deque *d) {
+    return getFront(d);
+}
+
+int main() {
+    Queue q;
+    initQueue(&q);
+    Deque maxDeque;
+    initDeque(&maxDeque);
+    
+    enqueueWithMax(&q, &maxDeque, 10);
+    enqueueWithMax(&q, &maxDeque, 5);
+    enqueueWithMax(&q, &maxDeque, 20);
+    enqueueWithMax(&q, &maxDeque, 15);
+    
+    printf("Current max: %d\n", getMax(&maxDeque)); // 20
+    dequeueWithMax(&q, &maxDeque); // remove 10
+    printf("Current max: %d\n", getMax(&maxDeque)); // still 20
+    dequeueWithMax(&q, &maxDeque); // remove 5
+    printf("Current max: %d\n", getMax(&maxDeque)); // still 20
+    dequeueWithMax(&q, &maxDeque); // remove 20 -> max becomes 15
+    printf("Current max: %d\n", getMax(&maxDeque));
+    return 0;
+}
+18. Browser History Simulation Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+#define URL_SIZE 100
+
+typedef struct {
+    char arr[MAX][URL_SIZE];
+    int top;
+} Stack;
+
+void initStack(Stack *s) { s->top = -1; }
+int isEmpty(Stack *s) { return s->top == -1; }
+void push(Stack *s, char *url) {
+    if (s->top == MAX - 1) { printf("History stack overflow\n"); return; }
+    strcpy(s->arr[++s->top], url);
+}
+char* pop(Stack *s) {
+    if (isEmpty(s)) return NULL;
+    return s->arr[s->top--];
+}
+
+int main() {
+    Stack backStack, forwardStack;
+    initStack(&backStack);
+    initStack(&forwardStack);
+    
+    char current[URL_SIZE] = "homepage.com";
+    char command[URL_SIZE];
+    char url[URL_SIZE];
+    
+    while (1) {
+        printf("Current: %s\n", current);
+        printf("Enter command (visit <url>, back, forward, exit): ");
+        fgets(command, URL_SIZE, stdin);
+        command[strcspn(command, "\n")] = 0;
+        
+        if (strncmp(command, "visit", 5) == 0) {
+            push(&backStack, current);
+            initStack(&forwardStack);
+            sscanf(command + 6, "%s", url);
+            strcpy(current, url);
+        } else if (strcmp(command, "back") == 0) {
+            if (isEmpty(&backStack))
+                printf("No back history\n");
+            else {
+                push(&forwardStack, current);
+                strcpy(current, pop(&backStack));
+            }
+        } else if (strcmp(command, "forward") == 0) {
+            if (isEmpty(&forwardStack))
+                printf("No forward history\n");
+            else {
+                push(&backStack, current);
+                strcpy(current, pop(&forwardStack));
+            }
+        } else if (strcmp(command, "exit") == 0) {
+            break;
+        } else {
+            printf("Invalid command\n");
+        }
+    }
+    return 0;
+}
+19. Undo–Redo Feature Using Two Stacks
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+#define ACTION_SIZE 100
+
+typedef struct {
+    char actions[MAX][ACTION_SIZE];
+    int top;
+} Stack;
+
+void initStack(Stack *s) { s->top = -1; }
+int isEmpty(Stack *s) { return s->top == -1; }
+void push(Stack *s, char *action) {
+    if (s->top == MAX - 1) { printf("Stack overflow\n"); return; }
+    strcpy(s->actions[++s->top], action);
+}
+char* pop(Stack *s) {
+    if (isEmpty(s)) return NULL;
+    return s->actions[s->top--];
+}
+
+int main() {
+    Stack undoStack, redoStack;
+    initStack(&undoStack);
+    initStack(&redoStack);
+    
+    char action[ACTION_SIZE];
+    char command[ACTION_SIZE];
+    
+    while (1) {
+        printf("Enter command (type <action>, undo, redo, exit): ");
+        fgets(command, ACTION_SIZE, stdin);
+        command[strcspn(command, "\n")] = 0;
+        
+        if (strncmp(command, "type", 4) == 0) {
+            strcpy(action, command + 5);
+            push(&undoStack, action);
+            initStack(&redoStack);
+            printf("Typed: %s\n", action);
+        } else if (strcmp(command, "undo") == 0) {
+            if (isEmpty(&undoStack))
+                printf("Nothing to undo\n");
+            else {
+                char *act = pop(&undoStack);
+                push(&redoStack, act);
+                printf("Undone: %s\n", act);
+            }
+        } else if (strcmp(command, "redo") == 0) {
+            if (isEmpty(&redoStack))
+                printf("Nothing to redo\n");
+            else {
+                char *act = pop(&redoStack);
+                push(&undoStack, act);
+                printf("Redone: %s\n", act);
+            }
+        } else if (strcmp(command, "exit") == 0) {
+            break;
+        } else {
+            printf("Invalid command\n");
+        }
+    }
+    return 0;
+}
+20. Infix to Postfix Conversion Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#define MAX 100
+
+typedef struct {
+    char arr[MAX];
+    int top;
+} Stack;
+
+void initStack(Stack *s) { s->top = -1; }
+int isEmpty(Stack *s) { return s->top == -1; }
+void push(Stack *s, char ch) { s->arr[++s->top] = ch; }
+char pop(Stack *s) { return s->arr[s->top--]; }
+char peek(Stack *s) { return s->arr[s->top]; }
+
+int precedence(char ch) {
+    switch (ch) {
+        case '+': case '-': return 1;
+        case '*': case '/': return 2;
+    }
+    return 0;
+}
+
+void infixToPostfix(char *infix, char *postfix) {
+    Stack s;
+    initStack(&s);
+    int k = 0;
+    for (int i = 0; infix[i]; i++) {
+        char ch = infix[i];
+        if (isalnum(ch))
+            postfix[k++] = ch;
+        else if (ch == '(')
+            push(&s, ch);
+        else if (ch == ')') {
+            while (!isEmpty(&s) && peek(&s) != '(')
+                postfix[k++] = pop(&s);
+            pop(&s);
+        } else {
+            while (!isEmpty(&s) && precedence(peek(&s)) >= precedence(ch))
+                postfix[k++] = pop(&s);
+            push(&s, ch);
+        }
+    }
+    while (!isEmpty(&s))
+        postfix[k++] = pop(&s);
+    postfix[k] = '\0';
+}
+
+int main() {
+    char infix[MAX], postfix[MAX];
+    printf("Enter infix expression: ");
+    fgets(infix, MAX, stdin);
+    infix[strcspn(infix, "\n")] = 0;
+    infixToPostfix(infix, postfix);
+    printf("Postfix: %s\n", postfix);
+    return 0;
+}
+21. Infix to Prefix Conversion Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#define MAX 100
+
+typedef struct {
+    char arr[MAX];
+    int top;
+} Stack;
+
+void initStack(Stack *s) { s->top = -1; }
+int isEmpty(Stack *s) { return s->top == -1; }
+void push(Stack *s, char ch) { s->arr[++s->top] = ch; }
+char pop(Stack *s) { return s->arr[s->top--]; }
+char peek(Stack *s) { return s->arr[s->top]; }
+
+int precedence(char ch) {
+    switch (ch) {
+        case '+': case '-': return 1;
+        case '*': case '/': return 2;
+    }
+    return 0;
+}
+
+void reverseStr(char *str) {
+    int len = strlen(str);
+    for (int i = 0; i < len / 2; i++) {
+        char temp = str[i];
+        str[i] = str[len - i - 1];
+        str[len - i - 1] = temp;
+    }
+}
+
+void infixToPostfix(char *infix, char *postfix) {
+    Stack s;
+    initStack(&s);
+    int k = 0;
+    for (int i = 0; infix[i]; i++) {
+        char ch = infix[i];
+        if (isalnum(ch))
+            postfix[k++] = ch;
+        else if (ch == '(')
+            push(&s, ch);
+        else if (ch == ')') {
+            while (!isEmpty(&s) && peek(&s) != '(')
+                postfix[k++] = pop(&s);
+            pop(&s);
+        } else {
+            while (!isEmpty(&s) && precedence(peek(&s)) >= precedence(ch))
+                postfix[k++] = pop(&s);
+            push(&s, ch);
+        }
+    }
+    while (!isEmpty(&s))
+        postfix[k++] = pop(&s);
+    postfix[k] = '\0';
+}
+
+void infixToPrefix(char *infix, char *prefix) {
+    char revInfix[MAX], revPostfix[MAX];
+    strcpy(revInfix, infix);
+    reverseStr(revInfix);
+    for (int i = 0; revInfix[i]; i++) {
+        if (revInfix[i] == '(')
+            revInfix[i] = ')';
+        else if (revInfix[i] == ')')
+            revInfix[i] = '(';
+    }
+    infixToPostfix(revInfix, revPostfix);
+    reverseStr(revPostfix);
+    strcpy(prefix, revPostfix);
+}
+
+int main() {
+    char infix[MAX], prefix[MAX];
+    printf("Enter infix expression: ");
+    fgets(infix, MAX, stdin);
+    infix[strcspn(infix, "\n")] = 0;
+    infixToPrefix(infix, prefix);
+    printf("Prefix: %s\n", prefix);
+    return 0;
+}
+22. Evaluate an Infix Expression Using Two Stacks
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int top;
+} IntStack;
+
+typedef struct {
+    char arr[MAX];
+    int top;
+} CharStack;
+
+void initIntStack(IntStack *s) { s->top = -1; }
+void initCharStack(CharStack *s) { s->top = -1; }
+
+int isEmptyInt(IntStack *s) { return s->top == -1; }
+int isEmptyChar(CharStack *s) { return s->top == -1; }
+
+void pushInt(IntStack *s, int x) { s->arr[++s->top] = x; }
+int popInt(IntStack *s) { return s->arr[s->top--]; }
+
+void pushChar(CharStack *s, char ch) { s->arr[++s->top] = ch; }
+char popChar(CharStack *s) { return s->arr[s->top--]; }
+char peekChar(CharStack *s) { return s->arr[s->top]; }
+
+int precedence(char op) {
+    switch (op) {
+        case '+': case '-': return 1;
+        case '*': case '/': return 2;
+    }
+    return 0;
+}
+
+int applyOp(int a, int b, char op) {
+    switch (op) {
+        case '+': return a + b;
+        case '-': return a - b;
+        case '*': return a * b;
+        case '/': return a / b;
+    }
+    return 0;
+}
+
+int evaluateInfix(char *exp) {
+    IntStack values;
+    CharStack ops;
+    initIntStack(&values);
+    initCharStack(&ops);
+    for (int i = 0; exp[i]; i++) {
+        if (exp[i] == ' ')
+            continue;
+        if (isdigit(exp[i])) {
+            int val = 0;
+            while (isdigit(exp[i])) {
+                val = (val * 10) + (exp[i] - '0');
+                i++;
+            }
+            i--;
+            pushInt(&values, val);
+        } else if (exp[i] == '(') {
+            pushChar(&ops, exp[i]);
+        } else if (exp[i] == ')') {
+            while (!isEmptyChar(&ops) && peekChar(&ops) != '(') {
+                int b = popInt(&values);
+                int a = popInt(&values);
+                char op = popChar(&ops);
+                pushInt(&values, applyOp(a, b, op));
+            }
+            popChar(&ops);
+        } else {
+            while (!isEmptyChar(&ops) && precedence(peekChar(&ops)) >= precedence(exp[i])) {
+                int b = popInt(&values);
+                int a = popInt(&values);
+                char op = popChar(&ops);
+                pushInt(&values, applyOp(a, b, op));
+            }
+            pushChar(&ops, exp[i]);
+        }
+    }
+    while (!isEmptyChar(&ops)) {
+        int b = popInt(&values);
+        int a = popInt(&values);
+        char op = popChar(&ops);
+        pushInt(&values, applyOp(a, b, op));
+    }
+    return popInt(&values);
+}
+
+int main() {
+    char exp[MAX];
+    printf("Enter infix expression: ");
+    fgets(exp, MAX, stdin);
+    exp[strcspn(exp, "\n")] = 0;
+    int result = evaluateInfix(exp);
+    printf("Result: %d\n", result);
+    return 0;
+}
+23. Bounded Queue with Overflow/Underflow Checks
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 10
+
+typedef struct {
+    int arr[MAX];
+    int front, rear, count;
+} BoundedQueue;
+
+void initQueue(BoundedQueue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+
+int isEmpty(BoundedQueue *q) { return q->count == 0; }
+int isFull(BoundedQueue *q) { return q->count == MAX; }
+
+void enqueue(BoundedQueue *q, int x) {
+    if (isFull(q)) {
+        printf("Queue Overflow\n");
+        return;
+    }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = x;
+    q->count++;
+}
+
+int dequeue(BoundedQueue *q) {
+    if (isEmpty(q)) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    int x = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return x;
+}
+
+void display(BoundedQueue *q) {
+    int i = q->front;
+    int cnt = q->count;
+    while (cnt--) {
+        printf("%d ", q->arr[i]);
+        i = (i + 1) % MAX;
+    }
+    printf("\n");
+}
+
+int main() {
+    BoundedQueue q;
+    initQueue(&q);
+    for (int i = 0; i < 12; i++) {
+        enqueue(&q, i);
+    }
+    display(&q);
+    for (int i = 0; i < 5; i++) {
+        printf("Dequeued: %d\n", dequeue(&q));
+    }
+    display(&q);
+    return 0;
+}
+24. Dynamically Resizing Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int *arr;
+    int capacity;
+    int top;
+} DynStack;
+
+void initStack(DynStack *s, int capacity) {
+    s->capacity = capacity;
+    s->top = -1;
+    s->arr = (int *)malloc(capacity * sizeof(int));
+}
+
+void push(DynStack *s, int x) {
+    if (s->top == s->capacity - 1) {
+        s->capacity *= 2;
+        s->arr = (int *)realloc(s->arr, s->capacity * sizeof(int));
+        printf("Stack resized to capacity %d\n", s->capacity);
+    }
+    s->arr[++s->top] = x;
+}
+
+int pop(DynStack *s) {
+    if (s->top == -1) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return s->arr[s->top--];
+}
+
+void display(DynStack *s) {
+    for (int i = 0; i <= s->top; i++) {
+        printf("%d ", s->arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    DynStack s;
+    initStack(&s, 2);
+    push(&s, 10);
+    push(&s, 20);
+    push(&s, 30);
+    display(&s);
+    printf("Popped: %d\n", pop(&s));
+    display(&s);
+    free(s.arr);
+    return 0;
+}
+25. Dynamically Resizing Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int *arr;
+    int capacity;
+    int front;
+    int rear;
+    int count;
+} DynQueue;
+
+void initQueue(DynQueue *q, int capacity) {
+    q->capacity = capacity;
+    q->arr = (int *)malloc(capacity * sizeof(int));
+    q->front = 0;
+    q->rear = -1;
+    q->count = 0;
+}
+
+void resizeQueue(DynQueue *q) {
+    int newCapacity = q->capacity * 2;
+    int *newArr = (int *)malloc(newCapacity * sizeof(int));
+    for (int i = 0; i < q->count; i++) {
+        newArr[i] = q->arr[(q->front + i) % q->capacity];
+    }
+    free(q->arr);
+    q->arr = newArr;
+    q->capacity = newCapacity;
+    q->front = 0;
+    q->rear = q->count - 1;
+    printf("Queue resized to capacity %d\n", q->capacity);
+}
+
+void enqueue(DynQueue *q, int x) {
+    if (q->count == q->capacity) {
+        resizeQueue(q);
+    }
+    q->rear = (q->rear + 1) % q->capacity;
+    q->arr[q->rear] = x;
+    q->count++;
+}
+
+int dequeue(DynQueue *q) {
+    if (q->count == 0) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    int x = q->arr[q->front];
+    q->front = (q->front + 1) % q->capacity;
+    q->count--;
+    return x;
+}
+
+void display(DynQueue *q) {
+    for (int i = 0; i < q->count; i++) {
+        printf("%d ", q->arr[(q->front + i) % q->capacity]);
+    }
+    printf("\n");
+}
+
+int main() {
+    DynQueue q;
+    initQueue(&q, 2);
+    enqueue(&q, 10);
+    enqueue(&q, 20);
+    enqueue(&q, 30);
+    display(&q);
+    printf("Dequeued: %d\n", dequeue(&q));
+    display(&q);
+    free(q.arr);
+    return 0;
+}
+26. Next Greater Element Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+int main() {
+    int arr[] = {4, 5, 2, 25};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int nge[n];
+    int stack[MAX];
+    int top = -1;
+    
+    for (int i = 0; i < n; i++) {
+        while (top != -1 && arr[i] > arr[stack[top]]) {
+            nge[stack[top]] = arr[i];
+            top--;
+        }
+        stack[++top] = i;
+    }
+    while (top != -1) {
+        nge[stack[top]] = -1;
+        top--;
+    }
+    for (int i = 0; i < n; i++) {
+        printf("%d -> %d\n", arr[i], nge[i]);
+    }
+    return 0;
+}
+27. Previous Smaller Element Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+int main() {
+    int arr[] = {4, 5, 2, 10, 8};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int pse[n];
+    int stack[MAX];
+    int top = -1;
+    
+    for (int i = 0; i < n; i++) {
+        while (top != -1 && arr[stack[top]] >= arr[i])
+            top--;
+        pse[i] = (top == -1) ? -1 : arr[stack[top]];
+        stack[++top] = i;
+    }
+    for (int i = 0; i < n; i++) {
+        printf("%d -> %d\n", arr[i], pse[i]);
+    }
+    return 0;
+}
+28. Implement a Stack Using Two Queues
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int front, rear, count;
+} Queue;
+
+void initQueue(Queue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+int isEmpty(Queue *q) { return q->count == 0; }
+void enqueue(Queue *q, int x) {
+    if (q->count == MAX) { printf("Queue Overflow\n"); return; }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = x;
+    q->count++;
+}
+int dequeue(Queue *q) {
+    if (isEmpty(q)) { printf("Queue Underflow\n"); return -1; }
+    int x = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return x;
+}
+
+typedef struct {
+    Queue q1;
+    Queue q2;
+} StackUsingQueues;
+
+void initStack(StackUsingQueues *s) {
+    initQueue(&s->q1);
+    initQueue(&s->q2);
+}
+
+void push(StackUsingQueues *s, int x) {
+    enqueue(&s->q2, x);
+    while (!isEmpty(&s->q1))
+        enqueue(&s->q2, dequeue(&s->q1));
+    Queue temp = s->q1;
+    s->q1 = s->q2;
+    s->q2 = temp;
+}
+
+int pop(StackUsingQueues *s) {
+    if (isEmpty(&s->q1)) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return dequeue(&s->q1);
+}
+
+int main() {
+    StackUsingQueues s;
+    initStack(&s);
+    push(&s, 10);
+    push(&s, 20);
+    push(&s, 30);
+    printf("Popped: %d\n", pop(&s));
+    printf("Popped: %d\n", pop(&s));
+    return 0;
+}
+29. Implement a Queue Using Two Stacks
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int top;
+} Stack;
+
+void initStack(Stack *s) { s->top = -1; }
+int isEmpty(Stack *s) { return s->top == -1; }
+void push(Stack *s, int x) {
+    if (s->top == MAX - 1) { printf("Stack Overflow\n"); return; }
+    s->arr[++s->top] = x;
+}
+int pop(Stack *s) {
+    if (isEmpty(s)) { printf("Stack Underflow\n"); return -1; }
+    return s->arr[s->top--];
+}
+
+typedef struct {
+    Stack s1;
+    Stack s2;
+} QueueUsingStacks;
+
+void initQueue(QueueUsingStacks *q) {
+    initStack(&q->s1);
+    initStack(&q->s2);
+}
+
+void enqueue(QueueUsingStacks *q, int x) {
+    push(&q->s1, x);
+}
+
+int dequeue(QueueUsingStacks *q) {
+    if (isEmpty(&q->s2)) {
+        while (!isEmpty(&q->s1))
+            push(&q->s2, pop(&q->s1));
+    }
+    if (isEmpty(&q->s2)) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    return pop(&q->s2);
+}
+
+int main() {
+    QueueUsingStacks q;
+    initQueue(&q);
+    enqueue(&q, 10);
+    enqueue(&q, 20);
+    enqueue(&q, 30);
+    printf("Dequeued: %d\n", dequeue(&q));
+    printf("Dequeued: %d\n", dequeue(&q));
+    return 0;
+}
+30. Multi‐Level Priority Queue Using an Array
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int front, rear, count;
+} Queue;
+
+void initQueue(Queue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+int isEmpty(Queue *q) { return q->count == 0; }
+void enqueue(Queue *q, int x) {
+    if (q->count == MAX) { printf("Queue Overflow\n"); return; }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = x;
+    q->count++;
+}
+int dequeue(Queue *q) {
+    if (isEmpty(q)) { printf("Queue Underflow\n"); return -1; }
+    int x = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return x;
+}
+
+typedef struct {
+    Queue levels[3]; // priority 0 (highest), 1, 2 (lowest)
+} MultiLevelPQ;
+
+void initPQ(MultiLevelPQ *pq) {
+    for (int i = 0; i < 3; i++)
+        initQueue(&pq->levels[i]);
+}
+
+void enqueuePQ(MultiLevelPQ *pq, int x, int priority) {
+    if (priority < 0 || priority > 2) {
+        printf("Invalid priority\n");
+        return;
+    }
+    enqueue(&pq->levels[priority], x);
+}
+
+int dequeuePQ(MultiLevelPQ *pq) {
+    for (int i = 0; i < 3; i++) {
+        if (!isEmpty(&pq->levels[i]))
+            return dequeue(&pq->levels[i]);
+    }
+    printf("Priority Queue Underflow\n");
+    return -1;
+}
+
+int main() {
+    MultiLevelPQ pq;
+    initPQ(&pq);
+    enqueuePQ(&pq, 10, 1);
+    enqueuePQ(&pq, 20, 0);
+    enqueuePQ(&pq, 30, 2);
+    enqueuePQ(&pq, 40, 1);
+    
+    printf("Dequeued: %d\n", dequeuePQ(&pq)); // should be 20 (priority 0)
+    printf("Dequeued: %d\n", dequeuePQ(&pq)); // then 10
+    return 0;
+}
+31. Task Scheduling Simulation Using a Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int taskId;
+} Task;
+
+typedef struct {
+    Task arr[MAX];
+    int front, rear, count;
+} TaskQueue;
+
+void initQueue(TaskQueue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+int isEmpty(TaskQueue *q) { return q->count == 0; }
+void enqueue(TaskQueue *q, Task t) {
+    if (q->count == MAX) { printf("Queue Overflow\n"); return; }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = t;
+    q->count++;
+}
+Task dequeue(TaskQueue *q) {
+    Task t = {0};
+    if (isEmpty(q)) { printf("Queue Underflow\n"); return t; }
+    t = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return t;
+}
+
+int main() {
+    TaskQueue q;
+    initQueue(&q);
+    for (int i = 1; i <= 5; i++) {
+        Task t; t.taskId = i;
+        printf("Scheduling task %d\n", t.taskId);
+        enqueue(&q, t);
+    }
+    while (!isEmpty(&q)) {
+        Task t = dequeue(&q);
+        printf("Executing task %d\n", t.taskId);
+    }
+    return 0;
+}
+32. Simulate a Call Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+#define NAME_SIZE 50
+
+typedef struct {
+    char call[NAME_SIZE];
+} StackFrame;
+
+typedef struct {
+    StackFrame arr[MAX];
+    int top;
+} CallStack;
+
+void initCallStack(CallStack *cs) { cs->top = -1; }
+void pushFrame(CallStack *cs, const char *name) {
+    if (cs->top == MAX - 1) { printf("Call Stack Overflow\n"); return; }
+    strcpy(cs->arr[++cs->top].call, name);
+}
+char* popFrame(CallStack *cs) {
+    if (cs->top == -1) { printf("Call Stack Underflow\n"); return NULL; }
+    return cs->arr[cs->top--].call;
+}
+void displayCallStack(CallStack *cs) {
+    printf("Call Stack:\n");
+    for (int i = 0; i <= cs->top; i++) {
+        printf("%s\n", cs->arr[i].call);
+    }
+}
+
+int main() {
+    CallStack cs;
+    initCallStack(&cs);
+    pushFrame(&cs, "main");
+    pushFrame(&cs, "functionA");
+    pushFrame(&cs, "functionB");
+    displayCallStack(&cs);
+    printf("Returning from %s\n", popFrame(&cs));
+    displayCallStack(&cs);
+    return 0;
+}
+33. Postfix Expression Calculator
+c
+Copy
+Edit
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+void push(int x) { stack[++top] = x; }
+int pop() { return stack[top--]; }
+
+int evaluatePostfix(char *exp) {
+    for (int i = 0; exp[i]; i++) {
+        if (isdigit(exp[i])) {
+            push(exp[i] - '0');
+        } else {
+            int b = pop();
+            int a = pop();
+            switch (exp[i]) {
+                case '+': push(a + b); break;
+                case '-': push(a - b); break;
+                case '*': push(a * b); break;
+                case '/': push(a / b); break;
+            }
+        }
+    }
+    return pop();
+}
+
+int main() {
+    char exp[MAX];
+    printf("Enter postfix expression: ");
+    scanf("%s", exp);
+    int result = evaluatePostfix(exp);
+    printf("Result: %d\n", result);
+    return 0;
+}
+34. Non‐Recursive Tree Traversals Using Stacks
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int data;
+    struct Node *left, *right;
+} Node;
+
+Node* newNode(int data) {
+    Node* n = (Node*)malloc(sizeof(Node));
+    n->data = data;
+    n->left = n->right = NULL;
+    return n;
+}
+
+void inorder(Node* root) {
+    Node* stack[100];
+    int top = -1;
+    Node* curr = root;
+    printf("Inorder: ");
+    while (curr || top != -1) {
+        while (curr) {
+            stack[++top] = curr;
+            curr = curr->left;
+        }
+        curr = stack[top--];
+        printf("%d ", curr->data);
+        curr = curr->right;
+    }
+    printf("\n");
+}
+
+void preorder(Node* root) {
+    if (root == NULL) return;
+    Node* stack[100];
+    int top = -1;
+    stack[++top] = root;
+    printf("Preorder: ");
+    while (top != -1) {
+        Node* curr = stack[top--];
+        printf("%d ", curr->data);
+        if (curr->right)
+            stack[++top] = curr->right;
+        if (curr->left)
+            stack[++top] = curr->left;
+    }
+    printf("\n");
+}
+
+void postorder(Node* root) {
+    Node* stack1[100], *stack2[100];
+    int top1 = -1, top2 = -1;
+    if (root)
+        stack1[++top1] = root;
+    while (top1 != -1) {
+        Node* curr = stack1[top1--];
+        stack2[++top2] = curr;
+        if (curr->left)
+            stack1[++top1] = curr->left;
+        if (curr->right)
+            stack1[++top1] = curr->right;
+    }
+    printf("Postorder: ");
+    while (top2 != -1) {
+        printf("%d ", stack2[top2--]->data);
+    }
+    printf("\n");
+}
+
+int main() {
+    Node* root = newNode(1);
+    root->left = newNode(2);
+    root->right = newNode(3);
+    root->left->left = newNode(4);
+    root->left->right = newNode(5);
+    
+    inorder(root);
+    preorder(root);
+    postorder(root);
+    
+    return 0;
+}
+35. Linked List Palindrome Checker Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+Node* newNode(int data) {
+    Node* n = (Node*)malloc(sizeof(Node));
+    n->data = data;
+    n->next = NULL;
+    return n;
+}
+
+bool isPalindrome(Node* head) {
+    int stack[100];
+    int top = -1;
+    Node* slow = head;
+    Node* fast = head;
+    
+    while (fast && fast->next) {
+        stack[++top] = slow->data;
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    if (fast)
+        slow = slow->next;
+    while (slow) {
+        if (stack[top--] != slow->data)
+            return false;
+        slow = slow->next;
+    }
+    return true;
+}
+
+int main() {
+    Node* head = newNode(1);
+    head->next = newNode(2);
+    head->next->next = newNode(3);
+    head->next->next->next = newNode(2);
+    head->next->next->next->next = newNode(1);
+    
+    if (isPalindrome(head))
+        printf("Linked list is a palindrome.\n");
+    else
+        printf("Linked list is not a palindrome.\n");
+    return 0;
+}
+36. Doubly Linked List–Based Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct DNode {
+    int data;
+    struct DNode* prev;
+    struct DNode* next;
+} DNode;
+
+DNode* top = NULL;
+
+void push(int x) {
+    DNode* newNode = (DNode*)malloc(sizeof(DNode));
+    newNode->data = x;
+    newNode->prev = NULL;
+    newNode->next = top;
+    if (top) top->prev = newNode;
+    top = newNode;
+}
+
+int pop() {
+    if (top == NULL) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    int x = top->data;
+    DNode* temp = top;
+    top = top->next;
+    if (top) top->prev = NULL;
+    free(temp);
+    return x;
+}
+
+void display() {
+    DNode* temp = top;
+    printf("Stack: ");
+    while (temp) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    push(10);
+    push(20);
+    push(30);
+    display();
+    printf("Popped: %d\n", pop());
+    display();
+    return 0;
+}
+37. Circular Doubly Linked List Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+} Node;
+
+Node* front = NULL;
+Node* rear = NULL;
+
+void enqueue(int x) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = x;
+    if (front == NULL) {
+        front = rear = newNode;
+        newNode->next = newNode->prev = newNode;
+    } else {
+        newNode->prev = rear;
+        newNode->next = front;
+        rear->next = newNode;
+        front->prev = newNode;
+        rear = newNode;
+    }
+}
+
+int dequeue() {
+    if (front == NULL) {
+        printf("Queue Underflow\n");
+        return -1;
+    }
+    int x = front->data;
+    if (front == rear) {
+        free(front);
+        front = rear = NULL;
+    } else {
+        Node* temp = front;
+        front = front->next;
+        rear->next = front;
+        front->prev = rear;
+        free(temp);
+    }
+    return x;
+}
+
+void display() {
+    if (front == NULL) {
+        printf("Queue is empty\n");
+        return;
+    }
+    Node* temp = front;
+    printf("Queue: ");
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != front);
+    printf("\n");
+}
+
+int main() {
+    enqueue(10);
+    enqueue(20);
+    enqueue(30);
+    display();
+    printf("Dequeued: %d\n", dequeue());
+    display();
+    return 0;
+}
+38. Ticket Booking System Simulation Using a Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+
+typedef struct {
+    int ticketId;
+    char customerName[50];
+} Ticket;
+
+typedef struct {
+    Ticket arr[MAX];
+    int front, rear, count;
+} TicketQueue;
+
+void initQueue(TicketQueue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+int isEmpty(TicketQueue *q) { return q->count == 0; }
+void enqueue(TicketQueue *q, Ticket t) {
+    if (q->count == MAX) { printf("Queue Overflow\n"); return; }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = t;
+    q->count++;
+}
+Ticket dequeue(TicketQueue *q) {
+    Ticket t = {0, ""};
+    if (isEmpty(q)) { printf("Queue Underflow\n"); return t; }
+    t = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return t;
+}
+
+int main() {
+    TicketQueue q;
+    initQueue(&q);
+    Ticket t1 = {1, "Alice"};
+    Ticket t2 = {2, "Bob"};
+    Ticket t3 = {3, "Charlie"};
+    enqueue(&q, t1);
+    enqueue(&q, t2);
+    enqueue(&q, t3);
+    
+    while (!isEmpty(&q)) {
+        Ticket t = dequeue(&q);
+        printf("Booking ticket %d for %s\n", t.ticketId, t.customerName);
+    }
+    return 0;
+}
+39. Multi‐Stack in a Single Array
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+#define NUM_STACKS 3
+
+typedef struct {
+    int arr[MAX];
+    int sizes[NUM_STACKS];
+} MultiStack;
+
+void initMultiStack(MultiStack *ms) {
+    for (int i = 0; i < NUM_STACKS; i++)
+        ms->sizes[i] = 0;
+}
+
+int indexOfTop(MultiStack *ms, int stackNum) {
+    int stackSize = ms->sizes[stackNum];
+    int offset = stackNum * (MAX / NUM_STACKS);
+    return offset + stackSize - 1;
+}
+
+void push(MultiStack *ms, int stackNum, int value) {
+    if (ms->sizes[stackNum] >= MAX / NUM_STACKS) {
+        printf("Stack %d Overflow\n", stackNum);
+        return;
+    }
+    ms->sizes[stackNum]++;
+    ms->arr[indexOfTop(ms, stackNum)] = value;
+}
+
+int pop(MultiStack *ms, int stackNum) {
+    if (ms->sizes[stackNum] == 0) {
+        printf("Stack %d Underflow\n", stackNum);
+        return -1;
+    }
+    int topIndex = indexOfTop(ms, stackNum);
+    int value = ms->arr[topIndex];
+    ms->sizes[stackNum]--;
+    return value;
+}
+
+int main() {
+    MultiStack ms;
+    initMultiStack(&ms);
+    push(&ms, 0, 10);
+    push(&ms, 0, 20);
+    push(&ms, 1, 30);
+    push(&ms, 2, 40);
+    printf("Popped from stack 0: %d\n", pop(&ms, 0));
+    printf("Popped from stack 1: %d\n", pop(&ms, 1));
+    printf("Popped from stack 2: %d\n", pop(&ms, 2));
+    return 0;
+}
+40. Reverse Order of Words in a Sentence Using a Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <string.h>
+#define MAX 1000
+
+int main() {
+    char sentence[MAX];
+    printf("Enter a sentence: ");
+    fgets(sentence, MAX, stdin);
+    sentence[strcspn(sentence, "\n")] = 0;
+    
+    char *words[MAX];
+    int count = 0;
+    char *token = strtok(sentence, " ");
+    while (token != NULL) {
+        words[count++] = token;
+        token = strtok(NULL, " ");
+    }
+    printf("Reversed sentence: ");
+    for (int i = count - 1; i >= 0; i--) {
+        printf("%s ", words[i]);
+    }
+    printf("\n");
+    return 0;
+}
+41. Sliding Window Maximum Using Deque
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+void slidingWindowMax(int arr[], int n, int k) {
+    int deque[MAX];
+    int front = 0, rear = -1;
+    for (int i = 0; i < n; i++) {
+        if (front <= rear && deque[front] <= i - k)
+            front++;
+        while (front <= rear && arr[deque[rear]] < arr[i])
+            rear--;
+        deque[++rear] = i;
+        if (i >= k - 1)
+            printf("%d ", arr[deque[front]]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int arr[] = {1, 3, -1, -3, 5, 3, 6, 7};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int k = 3;
+    slidingWindowMax(arr, n, k);
+    return 0;
+}
+42. Call Center Queue Simulation
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+
+typedef struct {
+    int callId;
+    char callerName[50];
+} Call;
+
+typedef struct {
+    Call arr[MAX];
+    int front, rear, count;
+} CallQueue;
+
+void initQueue(CallQueue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+int isEmpty(CallQueue *q) { return q->count == 0; }
+void enqueue(CallQueue *q, Call c) {
+    if (q->count == MAX) { printf("Queue Overflow\n"); return; }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = c;
+    q->count++;
+}
+Call dequeue(CallQueue *q) {
+    Call c = {0, ""};
+    if (isEmpty(q)) { printf("Queue Underflow\n"); return c; }
+    c = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return c;
+}
+
+int main() {
+    CallQueue q;
+    initQueue(&q);
+    Call c1 = {1, "Alice"};
+    Call c2 = {2, "Bob"};
+    Call c3 = {3, "Charlie"};
+    enqueue(&q, c1);
+    enqueue(&q, c2);
+    enqueue(&q, c3);
+    while (!isEmpty(&q)) {
+        Call c = dequeue(&q);
+        printf("Handling call %d from %s\n", c.callId, c.callerName);
+    }
+    return 0;
+}
+43. Frequency‐Tracking Stack
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int top;
+    int freq[1000]; // assuming elements in range 0-999
+} FreqStack;
+
+void initFreqStack(FreqStack *s) {
+    s->top = -1;
+    for (int i = 0; i < 1000; i++) s->freq[i] = 0;
+}
+
+void push(FreqStack *s, int x) {
+    if (s->top == MAX - 1) { printf("Stack Overflow\n"); return; }
+    s->arr[++s->top] = x;
+    s->freq[x]++;
+}
+
+int pop(FreqStack *s) {
+    if (s->top == -1) { printf("Stack Underflow\n"); return -1; }
+    int x = s->arr[s->top--];
+    s->freq[x]--;
+    return x;
+}
+
+int getFrequency(FreqStack *s, int x) {
+    return s->freq[x];
+}
+
+int main() {
+    FreqStack s;
+    initFreqStack(&s);
+    push(&s, 10);
+    push(&s, 20);
+    push(&s, 10);
+    push(&s, 30);
+    printf("Frequency of 10: %d\n", getFrequency(&s, 10));
+    pop(&s);
+    printf("Frequency of 10 after pop: %d\n", getFrequency(&s, 10));
+    return 0;
+}
+44. LRU Cache Simulation Using a Doubly Linked List
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int key, value;
+    struct Node* prev;
+    struct Node* next;
+} Node;
+
+typedef struct {
+    int capacity;
+    int count;
+    Node* head;
+    Node* tail;
+} LRUCache;
+
+LRUCache* createCache(int capacity) {
+    LRUCache* cache = (LRUCache*)malloc(sizeof(LRUCache));
+    cache->capacity = capacity;
+    cache->count = 0;
+    cache->head = cache->tail = NULL;
+    return cache;
+}
+
+void moveToHead(LRUCache* cache, Node* node) {
+    if (cache->head == node) return;
+    if (node->prev) node->prev->next = node->next;
+    if (node->next) node->next->prev = node->prev;
+    if (cache->tail == node) cache->tail = node->prev;
+    node->prev = NULL;
+    node->next = cache->head;
+    if (cache->head) cache->head->prev = node;
+    cache->head = node;
+    if (cache->tail == NULL) cache->tail = node;
+}
+
+void put(LRUCache* cache, int key, int value) {
+    Node* curr = cache->head;
+    while (curr) {
+        if (curr->key == key) {
+            curr->value = value;
+            moveToHead(cache, curr);
+            return;
+        }
+        curr = curr->next;
+    }
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->prev = newNode->next = NULL;
+    if (cache->count < cache->capacity) {
+        cache->count++;
+    } else {
+        Node* tail = cache->tail;
+        if (tail->prev) {
+            tail->prev->next = NULL;
+            cache->tail = tail->prev;
+        } else {
+            cache->head = cache->tail = NULL;
+        }
+        free(tail);
+    }
+    newNode->next = cache->head;
+    if (cache->head) cache->head->prev = newNode;
+    cache->head = newNode;
+    if (cache->tail == NULL) cache->tail = newNode;
+}
+
+int get(LRUCache* cache, int key) {
+    Node* curr = cache->head;
+    while (curr) {
+        if (curr->key == key) {
+            moveToHead(cache, curr);
+            return curr->value;
+        }
+        curr = curr->next;
+    }
+    return -1;
+}
+
+void displayCache(LRUCache* cache) {
+    Node* curr = cache->head;
+    printf("Cache: ");
+    while (curr) {
+        printf("(%d:%d) ", curr->key, curr->value);
+        curr = curr->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    LRUCache* cache = createCache(3);
+    put(cache, 1, 10);
+    put(cache, 2, 20);
+    put(cache, 3, 30);
+    displayCache(cache);
+    printf("Get key 2: %d\n", get(cache, 2));
+    displayCache(cache);
+    put(cache, 4, 40);
+    displayCache(cache);
+    return 0;
+}
+45. Printer Queue Simulation
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+
+typedef struct {
+    int jobId;
+    char documentName[50];
+} PrintJob;
+
+typedef struct {
+    PrintJob arr[MAX];
+    int front, rear, count;
+} PrinterQueue;
+
+void initQueue(PrinterQueue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+int isEmpty(PrinterQueue *q) { return q->count == 0; }
+void enqueue(PrinterQueue *q, PrintJob job) {
+    if (q->count == MAX) { printf("Queue Overflow\n"); return; }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = job;
+    q->count++;
+}
+PrintJob dequeue(PrinterQueue *q) {
+    PrintJob job = {0, ""};
+    if (isEmpty(q)) { printf("Queue Underflow\n"); return job; }
+    job = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return job;
+}
+
+int main() {
+    PrinterQueue pq;
+    initQueue(&pq);
+    PrintJob j1 = {1, "Doc1"};
+    PrintJob j2 = {2, "Doc2"};
+    PrintJob j3 = {3, "Doc3"};
+    enqueue(&pq, j1);
+    enqueue(&pq, j2);
+    enqueue(&pq, j3);
+    while (!isEmpty(&pq)) {
+        PrintJob job = dequeue(&pq);
+        printf("Printing job %d: %s\n", job.jobId, job.documentName);
+    }
+    return 0;
+}
+46. Display Stack Without Altering It
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+void push(int x) {
+    stack[++top] = x;
+}
+
+int pop() {
+    return stack[top--];
+}
+
+void displayStack() {
+    int temp[MAX];
+    int tempTop = -1;
+    for (int i = 0; i <= top; i++) {
+        temp[i] = stack[i];
+        tempTop = i;
+    }
+    printf("Stack: ");
+    for (int i = 0; i <= tempTop; i++)
+        printf("%d ", temp[i]);
+    printf("\n");
+}
+
+int main() {
+    push(10);
+    push(20);
+    push(30);
+    displayStack();
+    return 0;
+}
+47. Queue Peek Operation
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int front, rear, count;
+} Queue;
+
+void initQueue(Queue *q) {
+    q->front = 0; q->rear = -1; q->count = 0;
+}
+int isEmpty(Queue *q) { return q->count == 0; }
+void enqueue(Queue *q, int x) {
+    if (q->count == MAX) { printf("Queue Overflow\n"); return; }
+    q->rear = (q->rear + 1) % MAX;
+    q->arr[q->rear] = x;
+    q->count++;
+}
+int dequeue(Queue *q) {
+    if (isEmpty(q)) { printf("Queue Underflow\n"); return -1; }
+    int x = q->arr[q->front];
+    q->front = (q->front + 1) % MAX;
+    q->count--;
+    return x;
+}
+int peek(Queue *q) {
+    if (isEmpty(q)) { printf("Queue is empty\n"); return -1; }
+    return q->arr[q->front];
+}
+
+int main() {
+    Queue q;
+    initQueue(&q);
+    enqueue(&q, 10);
+    enqueue(&q, 20);
+    printf("Peek: %d\n", peek(&q));
+    dequeue(&q);
+    printf("Peek: %d\n", peek(&q));
+    return 0;
+}
+48. Circular Buffer Implementation
+c
+Copy
+Edit
+#include <stdio.h>
+#define MAX 5
+
+typedef struct {
+    int arr[MAX];
+    int head, tail, count;
+} CircularBuffer;
+
+void initBuffer(CircularBuffer *cb) {
+    cb->head = 0; cb->tail = 0; cb->count = 0;
+}
+
+int isFull(CircularBuffer *cb) { return cb->count == MAX; }
+int isEmpty(CircularBuffer *cb) { return cb->count == 0; }
+
+void add(CircularBuffer *cb, int x) {
+    if (isFull(cb)) {
+        printf("Buffer is full\n");
+        return;
+    }
+    cb->arr[cb->tail] = x;
+    cb->tail = (cb->tail + 1) % MAX;
+    cb->count++;
+}
+
+int removeItem(CircularBuffer *cb) {
+    if (isEmpty(cb)) {
+        printf("Buffer is empty\n");
+        return -1;
+    }
+    int x = cb->arr[cb->head];
+    cb->head = (cb->head + 1) % MAX;
+    cb->count--;
+    return x;
+}
+
+void display(CircularBuffer *cb) {
+    printf("Buffer: ");
+    for (int i = 0; i < cb->count; i++)
+        printf("%d ", cb->arr[(cb->head + i) % MAX]);
+    printf("\n");
+}
+
+int main() {
+    CircularBuffer cb;
+    initBuffer(&cb);
+    add(&cb, 10);
+    add(&cb, 20);
+    add(&cb, 30);
+    display(&cb);
+    removeItem(&cb);
+    display(&cb);
+    return 0;
+}
+49. Restaurant Waiting List Using a Queue
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 100
+
+typedef struct {
+    int partyId;
+    char name[50];
+} Party;
+
+typedef struct {
+    Party arr[MAX];
+    int front, rear, count;
+} WaitingList;
+
+void initList(WaitingList *wl) {
+    wl->front = 0; wl->rear = -1; wl->count = 0;
+}
+int isEmpty(WaitingList *wl) { return wl->count == 0; }
+void addParty(WaitingList *wl, Party p) {
+    if (wl->count == MAX) { printf("Waiting list full\n"); return; }
+    wl->rear = (wl->rear + 1) % MAX;
+    wl->arr[wl->rear] = p;
+    wl->count++;
+}
+Party seatParty(WaitingList *wl) {
+    Party p = {0, ""};
+    if (isEmpty(wl)) { printf("No parties waiting\n"); return p; }
+    p = wl->arr[wl->front];
+    wl->front = (wl->front + 1) % MAX;
+    wl->count--;
+    return p;
+}
+
+int main() {
+    WaitingList wl;
+    initList(&wl);
+    Party p1 = {1, "Smith"};
+    Party p2 = {2, "Johnson"};
+    addParty(&wl, p1);
+    addParty(&wl, p2);
+    Party seated = seatParty(&wl);
+    printf("Seated party: %s\n", seated.name);
+    return 0;
+}
+50. Min‐Heap Implementation
+c
+Copy
+Edit
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+typedef struct {
+    int arr[MAX];
+    int size;
+} MinHeap;
+
+void initHeap(MinHeap *h) {
+    h->size = 0;
+}
+
+void swap(int *a, int *b) {
+    int temp = *a; *a = *b; *b = temp;
+}
+
+void insert(MinHeap *h, int key) {
+    if (h->size == MAX) {
+        printf("Heap Overflow\n");
+        return;
+    }
+    h->arr[h->size] = key;
+    int i = h->size;
+    h->size++;
+    while (i != 0 && h->arr[(i - 1) / 2] > h->arr[i]) {
+        swap(&h->arr[(i - 1) / 2], &h->arr[i]);
+        i = (i - 1) / 2;
+    }
+}
+
+int extractMin(MinHeap *h) {
+    if (h->size <= 0)
+        return -1;
+    if (h->size == 1) {
+        h->size--;
+        return h->arr[0];
+    }
+    int root = h->arr[0];
+    h->arr[0] = h->arr[h->size - 1];
+    h->size--;
+    int i = 0;
+    while (2 * i + 1 < h->size) {
+        int smallest = i;
+        int left = 2 * i + 1, right = 2 * i + 2;
+        if (left < h->size && h->arr[left] < h->arr[smallest])
+            smallest = left;
+        if (right < h->size && h->arr[right] < h->arr[smallest])
+            smallest = right;
+        if (smallest != i) {
+            swap(&h->arr[i], &h->arr[smallest]);
+            i = smallest;
+        } else
+            break;
+    }
+    return root;
+}
+
+int main() {
+    MinHeap h;
+    initHeap(&h);
+    insert(&h, 3);
+    insert(&h, 2);
+    insert(&h, 15);
+    insert(&h, 5);
+    insert(&h, 4);
+    insert(&h, 45);
+    printf("Extracted Min: %d\n", extractMin(&h));
+    printf("Extracted Min: %d\n", extractMin(&h));
+    return 0;
+}
